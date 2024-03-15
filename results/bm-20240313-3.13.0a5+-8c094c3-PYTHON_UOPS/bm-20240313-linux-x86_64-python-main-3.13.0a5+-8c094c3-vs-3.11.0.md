@@ -1,0 +1,220 @@
+# Results vs. 3.11.0
+
+- fork: python
+- ref: main
+- machine: linux-x86_64
+- commit hash: 8c094c3
+- commit date: 2024-03-13
+- overall geometric mean: 1.04x slower
+- HPT reliability: 100.00%
+- HPT 99th percentile: 1.02x slower
+- Memory change: 1.01x
+
+Benchmarks with tag 'apps':
+===========================
+
+| Benchmark      | bm-20221024-linux-x86_64-python-v3.11.0-3.11.0-deaf509 | bm-20240313-linux-x86_64-python-main-3.13.0a5+-8c094c3 |
+|----------------|:------------------------------------------------------:|:------------------------------------------------------:|
+| 2to3           | 264 ms                                                 | 298 ms: 1.13x slower                                   |
+| chameleon      | 6.70 ms                                                | 6.87 ms: 1.03x slower                                  |
+| docutils       | 2.66 sec                                               | 2.87 sec: 1.08x slower                                 |
+| html5lib       | 64.8 ms                                                | 71.1 ms: 1.10x slower                                  |
+| tornado_http   | 98.1 ms                                                | 104 ms: 1.06x slower                                   |
+| Geometric mean | (ref)                                                  | 1.08x slower                                           |
+
+Benchmarks with tag 'asyncio':
+==============================
+
+| Benchmark                 | bm-20221024-linux-x86_64-python-v3.11.0-3.11.0-deaf509 | bm-20240313-linux-x86_64-python-main-3.13.0a5+-8c094c3 |
+|---------------------------|:------------------------------------------------------:|:------------------------------------------------------:|
+| async_tree_none           | 528 ms                                                 | 463 ms: 1.14x faster                                   |
+| async_tree_memoization    | 639 ms                                                 | 594 ms: 1.07x faster                                   |
+| async_tree_memoization_tg | 626 ms                                                 | 601 ms: 1.04x faster                                   |
+| async_tree_none_tg        | 491 ms                                                 | 473 ms: 1.04x faster                                   |
+| async_tree_io             | 1.29 sec                                               | 1.25 sec: 1.03x faster                                 |
+| async_tree_io_tg          | 1.29 sec                                               | 1.26 sec: 1.02x faster                                 |
+| Geometric mean            | (ref)                                                  | 1.04x faster                                           |
+
+Benchmark hidden because not significant (2): async_tree_cpu_io_mixed, async_tree_cpu_io_mixed_tg
+
+Benchmarks with tag 'math':
+===========================
+
+| Benchmark      | bm-20221024-linux-x86_64-python-v3.11.0-3.11.0-deaf509 | bm-20240313-linux-x86_64-python-main-3.13.0a5+-8c094c3 |
+|----------------|:------------------------------------------------------:|:------------------------------------------------------:|
+| pidigits       | 194 ms                                                 | 192 ms: 1.01x faster                                   |
+| float          | 78.9 ms                                                | 94.8 ms: 1.20x slower                                  |
+| nbody          | 96.0 ms                                                | 122 ms: 1.27x slower                                   |
+| Geometric mean | (ref)                                                  | 1.15x slower                                           |
+
+Benchmarks with tag 'regex':
+============================
+
+| Benchmark      | bm-20221024-linux-x86_64-python-v3.11.0-3.11.0-deaf509 | bm-20240313-linux-x86_64-python-main-3.13.0a5+-8c094c3 |
+|----------------|:------------------------------------------------------:|:------------------------------------------------------:|
+| regex_effbot   | 3.51 ms                                                | 3.59 ms: 1.02x slower                                  |
+| regex_v8       | 22.9 ms                                                | 25.6 ms: 1.12x slower                                  |
+| regex_dna      | 205 ms                                                 | 229 ms: 1.12x slower                                   |
+| regex_compile  | 141 ms                                                 | 177 ms: 1.25x slower                                   |
+| Geometric mean | (ref)                                                  | 1.13x slower                                           |
+
+Benchmarks with tag 'serialize':
+================================
+
+| Benchmark            | bm-20221024-linux-x86_64-python-v3.11.0-3.11.0-deaf509 | bm-20240313-linux-x86_64-python-main-3.13.0a5+-8c094c3 |
+|----------------------|:------------------------------------------------------:|:------------------------------------------------------:|
+| json_dumps           | 13.3 ms                                                | 10.6 ms: 1.26x faster                                  |
+| unpickle_list        | 5.21 us                                                | 4.91 us: 1.06x faster                                  |
+| pickle_pure_python   | 320 us                                                 | 306 us: 1.05x faster                                   |
+| pickle_dict          | 34.6 us                                                | 33.5 us: 1.03x faster                                  |
+| json_loads           | 29.2 us                                                | 28.3 us: 1.03x faster                                  |
+| xml_etree_parse      | 164 ms                                                 | 161 ms: 1.02x faster                                   |
+| xml_etree_iterparse  | 108 ms                                                 | 111 ms: 1.03x slower                                   |
+| pickle               | 11.0 us                                                | 11.5 us: 1.05x slower                                  |
+| pickle_list          | 4.59 us                                                | 4.97 us: 1.08x slower                                  |
+| tomli_loads          | 2.30 sec                                               | 2.51 sec: 1.09x slower                                 |
+| unpickle             | 13.8 us                                                | 15.1 us: 1.09x slower                                  |
+| xml_etree_process    | 56.9 ms                                                | 62.2 ms: 1.09x slower                                  |
+| xml_etree_generate   | 81.1 ms                                                | 90.7 ms: 1.12x slower                                  |
+| unpickle_pure_python | 242 us                                                 | 274 us: 1.13x slower                                   |
+| Geometric mean       | (ref)                                                  | 1.02x slower                                           |
+
+Benchmarks with tag 'startup':
+==============================
+
+| Benchmark              | bm-20221024-linux-x86_64-python-v3.11.0-3.11.0-deaf509 | bm-20240313-linux-x86_64-python-main-3.13.0a5+-8c094c3 |
+|------------------------|:------------------------------------------------------:|:------------------------------------------------------:|
+| python_startup         | 8.56 ms                                                | 10.4 ms: 1.22x slower                                  |
+| python_startup_no_site | 6.01 ms                                                | 8.99 ms: 1.50x slower                                  |
+| Geometric mean         | (ref)                                                  | 1.35x slower                                           |
+
+Benchmarks with tag 'template':
+===============================
+
+| Benchmark       | bm-20221024-linux-x86_64-python-v3.11.0-3.11.0-deaf509 | bm-20240313-linux-x86_64-python-main-3.13.0a5+-8c094c3 |
+|-----------------|:------------------------------------------------------:|:------------------------------------------------------:|
+| django_template | 33.5 ms                                                | 34.5 ms: 1.03x slower                                  |
+| genshi_xml      | 53.4 ms                                                | 63.1 ms: 1.18x slower                                  |
+| mako            | 10.7 ms                                                | 12.6 ms: 1.18x slower                                  |
+| genshi_text     | 22.5 ms                                                | 27.3 ms: 1.21x slower                                  |
+| Geometric mean  | (ref)                                                  | 1.15x slower                                           |
+
+All benchmarks:
+===============
+
+| Benchmark                 | bm-20221024-linux-x86_64-python-v3.11.0-3.11.0-deaf509 | bm-20240313-linux-x86_64-python-main-3.13.0a5+-8c094c3 |
+|---------------------------|:------------------------------------------------------:|:------------------------------------------------------:|
+| typing_runtime_protocols  | 520 us                                                 | 116 us: 4.47x faster                                   |
+| generators                | 74.9 ms                                                | 30.9 ms: 2.42x faster                                  |
+| asyncio_tcp               | 875 ms                                                 | 507 ms: 1.73x faster                                   |
+| asyncio_tcp_ssl           | 3.11 sec                                               | 1.86 sec: 1.67x faster                                 |
+| pylint                    | 476 ms                                                 | 331 ms: 1.44x faster                                   |
+| json_dumps                | 13.3 ms                                                | 10.6 ms: 1.26x faster                                  |
+| coroutines                | 27.0 ms                                                | 22.3 ms: 1.21x faster                                  |
+| async_tree_none           | 528 ms                                                 | 463 ms: 1.14x faster                                   |
+| comprehensions            | 23.6 us                                                | 21.4 us: 1.11x faster                                  |
+| async_tree_memoization    | 639 ms                                                 | 594 ms: 1.07x faster                                   |
+| unpickle_list             | 5.21 us                                                | 4.91 us: 1.06x faster                                  |
+| logging_silent            | 111 ns                                                 | 105 ns: 1.06x faster                                   |
+| pickle_pure_python        | 320 us                                                 | 306 us: 1.05x faster                                   |
+| async_tree_memoization_tg | 626 ms                                                 | 601 ms: 1.04x faster                                   |
+| deepcopy_reduce           | 3.22 us                                                | 3.09 us: 1.04x faster                                  |
+| async_tree_none_tg        | 491 ms                                                 | 473 ms: 1.04x faster                                   |
+| djangocms                 | 33.5 us                                                | 32.4 us: 1.03x faster                                  |
+| deltablue                 | 3.92 ms                                                | 3.80 ms: 1.03x faster                                  |
+| async_tree_io             | 1.29 sec                                               | 1.25 sec: 1.03x faster                                 |
+| pickle_dict               | 34.6 us                                                | 33.5 us: 1.03x faster                                  |
+| json_loads                | 29.2 us                                                | 28.3 us: 1.03x faster                                  |
+| async_tree_io_tg          | 1.29 sec                                               | 1.26 sec: 1.02x faster                                 |
+| xml_etree_parse           | 164 ms                                                 | 161 ms: 1.02x faster                                   |
+| pidigits                  | 194 ms                                                 | 192 ms: 1.01x faster                                   |
+| deepcopy                  | 365 us                                                 | 364 us: 1.00x faster                                   |
+| sqlglot_parse             | 1.43 ms                                                | 1.44 ms: 1.01x slower                                  |
+| gc_traversal              | 4.01 ms                                                | 4.05 ms: 1.01x slower                                  |
+| sympy_integrate           | 21.5 ms                                                | 21.7 ms: 1.01x slower                                  |
+| sqlglot_normalize         | 113 ms                                                 | 114 ms: 1.01x slower                                   |
+| logging_simple            | 6.22 us                                                | 6.32 us: 1.02x slower                                  |
+| mdp                       | 2.77 sec                                               | 2.83 sec: 1.02x slower                                 |
+| sqlglot_transpile         | 1.75 ms                                                | 1.79 ms: 1.02x slower                                  |
+| richards_super            | 61.9 ms                                                | 63.4 ms: 1.02x slower                                  |
+| asyncio_websockets        | 550 ms                                                 | 564 ms: 1.02x slower                                   |
+| regex_effbot              | 3.51 ms                                                | 3.59 ms: 1.02x slower                                  |
+| chameleon                 | 6.70 ms                                                | 6.87 ms: 1.03x slower                                  |
+| xml_etree_iterparse       | 108 ms                                                 | 111 ms: 1.03x slower                                   |
+| django_template           | 33.5 ms                                                | 34.5 ms: 1.03x slower                                  |
+| sympy_str                 | 297 ms                                                 | 307 ms: 1.03x slower                                   |
+| dask                      | 365 ms                                                 | 378 ms: 1.03x slower                                   |
+| logging_format            | 6.81 us                                                | 7.09 us: 1.04x slower                                  |
+| deepcopy_memo             | 40.2 us                                                | 41.9 us: 1.04x slower                                  |
+| pickle                    | 11.0 us                                                | 11.5 us: 1.05x slower                                  |
+| chaos                     | 71.9 ms                                                | 75.3 ms: 1.05x slower                                  |
+| pathlib                   | 18.5 ms                                                | 19.4 ms: 1.05x slower                                  |
+| bench_thread_pool         | 834 us                                                 | 876 us: 1.05x slower                                   |
+| thrift                    | 784 us                                                 | 829 us: 1.06x slower                                   |
+| tornado_http              | 98.1 ms                                                | 104 ms: 1.06x slower                                   |
+| create_gc_cycles          | 1.43 ms                                                | 1.52 ms: 1.06x slower                                  |
+| sympy_expand              | 484 ms                                                 | 519 ms: 1.07x slower                                   |
+| docutils                  | 2.66 sec                                               | 2.87 sec: 1.08x slower                                 |
+| pickle_list               | 4.59 us                                                | 4.97 us: 1.08x slower                                  |
+| tomli_loads               | 2.30 sec                                               | 2.51 sec: 1.09x slower                                 |
+| unpickle                  | 13.8 us                                                | 15.1 us: 1.09x slower                                  |
+| xml_etree_process         | 56.9 ms                                                | 62.2 ms: 1.09x slower                                  |
+| meteor_contest            | 109 ms                                                 | 119 ms: 1.10x slower                                   |
+| html5lib                  | 64.8 ms                                                | 71.1 ms: 1.10x slower                                  |
+| gunicorn                  | 1.20 ms                                                | 1.32 ms: 1.10x slower                                  |
+| aiohttp                   | 1.12 ms                                                | 1.23 ms: 1.10x slower                                  |
+| sqlglot_optimize          | 55.3 ms                                                | 61.2 ms: 1.11x slower                                  |
+| raytrace                  | 309 ms                                                 | 345 ms: 1.12x slower                                   |
+| xml_etree_generate        | 81.1 ms                                                | 90.7 ms: 1.12x slower                                  |
+| regex_v8                  | 22.9 ms                                                | 25.6 ms: 1.12x slower                                  |
+| regex_dna                 | 205 ms                                                 | 229 ms: 1.12x slower                                   |
+| sqlite_synth              | 2.57 us                                                | 2.89 us: 1.12x slower                                  |
+| 2to3                      | 264 ms                                                 | 298 ms: 1.13x slower                                   |
+| dulwich_log               | 64.6 ms                                                | 73.0 ms: 1.13x slower                                  |
+| unpickle_pure_python      | 242 us                                                 | 274 us: 1.13x slower                                   |
+| pycparser                 | 1.19 sec                                               | 1.35 sec: 1.14x slower                                 |
+| richards                  | 49.8 ms                                                | 56.9 ms: 1.14x slower                                  |
+| crypto_pyaes              | 76.7 ms                                                | 87.7 ms: 1.14x slower                                  |
+| scimark_sor               | 121 ms                                                 | 142 ms: 1.17x slower                                   |
+| pprint_safe_repr          | 747 ms                                                 | 873 ms: 1.17x slower                                   |
+| pprint_pformat            | 1.55 sec                                               | 1.83 sec: 1.18x slower                                 |
+| scimark_sparse_mat_mult   | 5.03 ms                                                | 5.92 ms: 1.18x slower                                  |
+| genshi_xml                | 53.4 ms                                                | 63.1 ms: 1.18x slower                                  |
+| mako                      | 10.7 ms                                                | 12.6 ms: 1.18x slower                                  |
+| fannkuch                  | 405 ms                                                 | 481 ms: 1.19x slower                                   |
+| nqueens                   | 87.9 ms                                                | 104 ms: 1.19x slower                                   |
+| go                        | 149 ms                                                 | 178 ms: 1.20x slower                                   |
+| float                     | 78.9 ms                                                | 94.8 ms: 1.20x slower                                  |
+| scimark_monte_carlo       | 70.7 ms                                                | 85.4 ms: 1.21x slower                                  |
+| genshi_text               | 22.5 ms                                                | 27.3 ms: 1.21x slower                                  |
+| python_startup            | 8.56 ms                                                | 10.4 ms: 1.22x slower                                  |
+| coverage                  | 78.8 ms                                                | 97.5 ms: 1.24x slower                                  |
+| unpack_sequence           | 43.5 ns                                                | 54.1 ns: 1.25x slower                                  |
+| scimark_fft               | 345 ms                                                 | 432 ms: 1.25x slower                                   |
+| regex_compile             | 141 ms                                                 | 177 ms: 1.25x slower                                   |
+| async_generators          | 374 ms                                                 | 472 ms: 1.26x slower                                   |
+| nbody                     | 96.0 ms                                                | 122 ms: 1.27x slower                                   |
+| telco                     | 6.86 ms                                                | 8.91 ms: 1.30x slower                                  |
+| spectral_norm             | 108 ms                                                 | 143 ms: 1.32x slower                                   |
+| hexiom                    | 6.89 ms                                                | 9.14 ms: 1.33x slower                                  |
+| mypy2                     | 686 ms                                                 | 918 ms: 1.34x slower                                   |
+| scimark_lu                | 116 ms                                                 | 158 ms: 1.35x slower                                   |
+| pyflate                   | 434 ms                                                 | 590 ms: 1.36x slower                                   |
+| python_startup_no_site    | 6.01 ms                                                | 8.99 ms: 1.50x slower                                  |
+| Geometric mean            | (ref)                                                  | 1.04x slower                                           |
+
+Benchmark hidden because not significant (5): async_tree_cpu_io_mixed, json, async_tree_cpu_io_mixed_tg, bench_mp_pool, sympy_sum
+Ignored benchmarks (3) of results/bm-20221024-3.11.0-deaf509/bm-20221024-linux-x86_64-python-v3.11.0-3.11.0-deaf509.json: flaskblogging, sqlalchemy_declarative, sqlalchemy_imperative
+
+
+# HPT report
+
+- Reliability score: 100.00% likely to be slow
+- 90% likely to have a slowdown of 1.04x
+- 95% likely to have a slowdown of 1.03x
+- 99% likely to have a slowdown of 1.02x
+
+
+# Memory
+
+- memory change: 1.01x

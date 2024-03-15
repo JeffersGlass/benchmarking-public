@@ -1,0 +1,27 @@
+# Generated file: !!! DO NOT EDIT !!!
+---
+env:
+  PYPERFORMANCE_HASH: 16765924a3e845fe9c3c582b7576e5f1285955df
+  PYSTON_BENCHMARKS_HASH: d9506cae863bb5c199ea71dce6a1733a12ba3ab8
+name: ci
+on:
+  pull_request:
+  push:
+    branches:
+    - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: pip
+    - name: Install dependencies
+      run: |
+        python -m pip install -r requirements.txt
+    - name: Run sanity check
+      run: |
+        python -m bench_runner install --check
