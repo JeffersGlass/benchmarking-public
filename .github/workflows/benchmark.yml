@@ -132,9 +132,3 @@ jobs:
     if: ${{ always() }}
     needs: [head, base, pystats-head, pystats-base]
     secrets: inherit
-
-  publish:
-    uses: ./.github/workflows/_publish.yml
-    if: ${{ always() }}
-    needs: [generate]
-    secrets: inherit
