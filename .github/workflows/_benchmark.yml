@@ -75,7 +75,7 @@ jobs:
     steps:
     - name: Setup environment
       run: |-
-        echo "BENCHMARK_MACHINE_NICKNAME=linux" >> $GITHUB_ENVbz
+        echo "BENCHMARK_MACHINE_NICKNAME=linux" >> $GITHUB_ENV
     - name: Checkout benchmarking
       uses: actions/checkout@v4
     - name: Setup system Python
