@@ -76,8 +76,8 @@ jobs:
     - name: Setup environment
       run: |-
         echo "BENCHMARK_MACHINE_NICKNAME=linux" >> $GITHUB_ENV
-        apt-get install clang-16 clang-tools-16 clang-16-doc libclang-16-dev clang-format-16 python3-clang-16 clangd-16 clang-tidy-16
-        apt-get install libllvm16 llvm-16 llvm-16-dev llvm-16-runtime
+        sudo apt-get install clang-1 6 clang-tools-16 clang-16-doc libclang-16-dev clang-format-16 python3-clang-16 clangd-16 clang-tidy-16
+        sudo apt-get install libllvm16 llvm-16 llvm-16-dev llvm-16-runtime
     - name: Checkout benchmarking
       uses: actions/checkout@v4
     - name: Setup system Python
