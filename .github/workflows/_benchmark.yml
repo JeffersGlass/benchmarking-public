@@ -77,10 +77,10 @@ jobs:
       run: |-
         echo "BENCHMARK_MACHINE_NICKNAME=linux" >> $GITHUB_ENV
     - name: Install Packages
-      uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        packages: clang-16 clang-tools-16 clang-16-doc libclang-16-dev clang-format-16 python3-clang-16 clangd-16 clang-tidy-16 libllvm16 llvm-16 llvm-16-dev llvm-16-runtime
-        version: 1.0
+      run: |-
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 16
     - name: Checkout benchmarking
       uses: actions/checkout@v4
     - name: Setup system Python
