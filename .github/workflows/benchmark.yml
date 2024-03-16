@@ -13,17 +13,6 @@ on:
       ref:
         description: Branch, tag or (full) SHA commit to benchmark
         default: main
-      machine:
-        description: Machine to run on
-        default: linux-amd64
-        type: choice
-        options:
-        - linux-x86_64-linux
-        - darwin-arm64-darwin
-        - windows-x86_64-pythonperf1
-        - windows-x86-pythonperf1_win32
-        - linux-x86_64-pythonperf2
-        - all
       benchmarks:
         description: Benchmarks to run (comma-separated; empty runs all benchmarks)
         type: string
@@ -79,7 +68,7 @@ jobs:
     - name: Determine base
       id: base
       run: |
-        python -m bench_runner get_merge_base ${{ inputs.benchmark_base }} ${{ inputs.machine }} ${{ inputs.pystats }} ${{ inputs.tier2 }} ${{ inputs.jit }} >> $GITHUB_OUTPUT
+        python -m bench_runner get_merge_base ${{ inputs.benchmark_base }} ${{ inputs.pystats }} ${{ inputs.tier2 }} ${{ inputs.jit }} >> $GITHUB_OUTPUT
         cat $GITHUB_OUTPUT
 
   head:
@@ -87,7 +76,6 @@ jobs:
     with:
       fork: ${{ inputs.fork }}
       ref: ${{ inputs.ref }}
-      machine: ${{ inputs.machine }}
       benchmarks: ${{ inputs.benchmarks }}
       pgo: true
       perf: false
@@ -103,7 +91,6 @@ jobs:
     with:
       fork: python
       ref: ${{ needs.determine_base.outputs.ref }}
-      machine: ${{ inputs.machine }}
       benchmarks: ${{ inputs.benchmarks }}
       pgo: true
       perf: false

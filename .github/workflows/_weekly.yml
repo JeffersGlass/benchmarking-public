@@ -5,8 +5,6 @@ env:
   PYSTON_BENCHMARKS_HASH: d9506cae863bb5c199ea71dce6a1733a12ba3ab8
 name: _weekly
 on:
-  schedule:
-  - cron: 0 0 * * 0
   workflow_dispatch: {}
 jobs:
   # Determine the base commit of the selected commit. The output is passed to
