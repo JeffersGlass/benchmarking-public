@@ -13,9 +13,6 @@ on:
       ref:
         description: Branch, tag or (full) SHA commit to benchmark
         type: string
-      machine:
-        description: Machine to run on
-        type: string
       benchmarks:
         description: Benchmarks to run (comma-separated; empty runs all benchmarks)
         type: string
@@ -48,15 +45,6 @@ on:
         description: Branch, tag or (full) SHA commit to benchmark
         type: string
         default: main
-      machine:
-        description: Machine to run on
-        default: linux-amd64
-        type: choice
-        options:
-        - linux-x86_64-linux
-        - darwin-arm64-darwin
-        - windows-x86_64-pythonperf1
-        - all
       benchmarks:
         description: Benchmarks to run (comma-separated; empty runs all benchmarks)
         type: string
@@ -81,13 +69,18 @@ on:
 
 jobs:
   benchmark-linux-x86_64-linux:
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
     timeout-minutes: 300
 
     steps:
     - name: Setup environment
       run: |-
         echo "BENCHMARK_MACHINE_NICKNAME=linux" >> $GITHUB_ENV
+    - name: Install Packages
+      run: |-
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 16
     - name: Checkout benchmarking
       uses: actions/checkout@v4
     - name: Setup system Python
@@ -109,7 +102,7 @@ jobs:
       if: ${{ always() }}
       id: should_run
       run: |
-        venv/bin/python -m bench_runner should_run ${{ inputs.force }} ${{ inputs.fork }} ${{ inputs.ref }} ${{ inputs.machine }} false ${{ inputs.tier2 }} ${{ inputs.jit }}>> $GITHUB_OUTPUT
+        venv/bin/python -m bench_runner should_run ${{ inputs.force }} ${{ inputs.fork }} ${{ inputs.ref }} all false ${{ inputs.tier2 }} ${{ inputs.jit }}>> $GITHUB_OUTPUT
     - name: Checkout python-macrobenchmarks
       uses: actions/checkout@v4
       if: ${{ steps.should_run.outputs.should_run != 'false' }}
@@ -178,180 +171,3 @@ jobs:
         name: perf
         path: |
           profiling/results
-
-    if: ${{ (inputs.machine == 'linux-x86_64-linux' || inputs.machine == 'all') }}
-  benchmark-darwin-arm64-darwin:
-    runs-on: [macos-latest]
-
-    steps:
-    - name: Setup environment
-      run: |-
-        echo "BENCHMARK_MACHINE_NICKNAME=darwin" >> $GITHUB_ENV
-    - name: Checkout benchmarking
-      uses: actions/checkout@v4
-    - name: Checkout CPython
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ inputs.fork }}/cpython
-        path: cpython
-        ref: ${{ inputs.ref }}
-        fetch-depth: 50
-    - name: Install dependencies from PyPI
-      run: |
-        python3 -m venv venv
-        venv/bin/python -m pip install -r requirements.txt
-    - name: Should we run?
-      if: ${{ always() }}
-      id: should_run
-      run: |
-        venv/bin/python -m bench_runner should_run ${{ inputs.force }} ${{ inputs.force }} ${{ inputs.ref }} ${{ inputs.machine }} false ${{ inputs.tier2 }} ${{ inputs.jit }}>> $GITHUB_OUTPUT
-    - name: Checkout python-macrobenchmarks
-      uses: actions/checkout@v4
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      with:
-        repository: pyston/python-macrobenchmarks
-        path: pyston-benchmarks
-        ref: ${{ env.PYSTON_BENCHMARKS_HASH }}
-    - name: Checkout pyperformance
-      uses: actions/checkout@v4
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      with:
-        repository: python/pyperformance
-        path: pyperformance
-        ref: ${{ env.PYPERFORMANCE_HASH }}
-    - name: Setup environment
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      run: |
-        echo "PKG_CONFIG_PATH=$(brew --prefix openssl@1.1)/lib/pkgconfig" >> $GITHUB_ENV
-    - name: Enable Tier 2
-      if: ${{ inputs.tier2 }}
-      run: |
-        echo "PYTHON_UOPS=1" >> "$GITHUB_ENV"
-    - name: Build Python
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      run: |
-        cd cpython
-        ./configure ${{ inputs.pgo == true && '--enable-optimizations --with-lto=yes' || '' }} ${{ inputs.jit == true && '--enable-experimental-jit' || '' }}
-        make -j4
-      # On macos ARM64, actions/setup-python isn't available, so we rely on a
-      # pre-installed homebrew one, used through a venv
-    - name: Install pyperformance
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      run: |
-        venv/bin/python -m pip install --no-binary :all: ./pyperformance
-    - name: Running pyperformance
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      run: |
-        venv/bin/python -m bench_runner run_benchmarks benchmark cpython/python.exe ${{ inputs.fork }} ${{ inputs.ref }} ${{ inputs.benchmarks || 'all' }} --run_id ${{ github.run_id }} ${{ inputs.tier2 == true && '--flag PYTHON_UOPS' || '' }} ${{ inputs.jit == true && '--flag JIT' || '' }}
-      # Pull again, since another job may have committed results in the meantime
-    - name: Pull benchmarking
-      if: ${{ steps.should_run.outputs.should_run != 'false' && !inputs.dry_run }}
-      run: |
-        # Another benchmarking task may have created results for the same
-        # commit while the above was running. This "magic" incantation means
-        # that any local results for this commit will override anything we
-        # just pulled in in that case.
-        git pull -s recursive -X ours --autostash --rebase
-    - name: Add data to repo
-      if: ${{ steps.should_run.outputs.should_run != 'false' && !inputs.dry_run }}
-      uses: EndBug/add-and-commit@v9
-      with:
-        add: results
-    - name: Upload artifacts
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: benchmark
-        path: |
-          benchmark.json
-        overwrite: true
-    if: ${{ (inputs.machine == 'darwin-arm64-darwin' || inputs.machine == 'all') }}
-  benchmark-windows-x86_64-pythonperf1:
-    runs-on: [windows-latest]
-    steps:
-      # Tell git to checkout repos with symlinks (required by pyston
-      # benchmarks).
-      # Requires "Developer Mode" switched on in Windows 10/11
-    - name: Setup environment
-      run: |-
-        echo "BUILD_DEST=PCBuild/amd64" >> $env:GITHUB_ENV
-        echo "BENCHMARK_MACHINE_NICKNAME=pythonperf1" >> $env:GITHUB_ENV
-    - name: Enable symlinks for git
-      run: |
-        git config --global core.symlinks true
-    - name: Checkout benchmarking
-      uses: actions/checkout@v4
-    - name: Checkout CPython
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ inputs.fork }}/cpython
-        path: cpython
-        ref: ${{ inputs.ref }}
-        fetch-depth: 50
-    - name: Install dependencies from PyPI
-      run: |
-        py -m venv venv
-        venv\Scripts\python.exe -m pip install -r requirements.txt
-    - name: Should we run?
-      if: ${{ always() }}
-      id: should_run
-      run: |
-        venv\Scripts\python.exe -m bench_runner should_run ${{ inputs.force }} ${{ inputs.fork }} ${{ inputs.ref }} ${{ inputs.machine }} false ${{ inputs.tier2 }} ${{ inputs.jit }}>> $GITHUB_OUTPUT
-    - name: Checkout python-macrobenchmarks
-      uses: actions/checkout@v4
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      with:
-        repository: pyston/python-macrobenchmarks
-        path: pyston-benchmarks
-        ref: ${{ env.PYSTON_BENCHMARKS_HASH }}
-    - name: Checkout pyperformance
-      uses: actions/checkout@v4
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      with:
-        repository: python/pyperformance
-        path: pyperformance
-        ref: ${{ env.PYPERFORMANCE_HASH }}
-    - name: Enable Tier 2
-      if: ${{ inputs.tier2 }}
-      run: |
-        echo "PYTHON_UOPS=1" >> $env:GITHUB_ENV
-    - name: Build Python
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      run: |
-        cd cpython
-        PCbuild\build.bat ($env:BUILD_FLAGS -split ' ') ${{ inputs.pgo == true && '--pgo' || '' }} ${{ inputs.jit == true && '--experimental-jit' || '' }} -c Release
-        # Copy the build products to a place that libraries can find them.
-        Copy-Item -Path $env:BUILD_DEST -Destination "libs" -Recurse
-    - name: Install pyperformance
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      run: |
-        venv\Scripts\python.exe -m pip install --no-binary :all: .\pyperformance
-    - name: Running pyperformance
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      run: |
-        venv\Scripts\python.exe -m bench_runner run_benchmarks benchmark cpython\$env:BUILD_DEST\python.exe ${{ inputs.fork }} ${{ inputs.ref }} ${{ inputs.benchmarks || 'all' }} --run_id ${{ github.run_id }} ${{ inputs.tier2 == true && '--flag PYTHON_UOPS' || '' }} ${{ inputs.jit == true && '--flag JIT' || '' }}
-      # Pull again, since another job may have committed results in the meantime
-    - name: Pull benchmarking
-      if: ${{ steps.should_run.outputs.should_run != 'false' && !inputs.dry_run }}
-      run: |
-        # Another benchmarking task may have created results for the same
-        # commit while the above was running. This "magic" incantation means
-        # that any local results for this commit will override anything we
-        # just pulled in in that case.
-        git pull -s recursive -X ours --autostash --rebase
-    - name: Add data to repo
-      if: ${{ steps.should_run.outputs.should_run != 'false' && !inputs.dry_run }}
-      uses: EndBug/add-and-commit@v9
-      with:
-        add: results
-    - name: Upload artifacts
-      if: ${{ steps.should_run.outputs.should_run != 'false' }}
-      uses: actions/upload-artifact@v4
-      with:
-        name: benchmark
-        path: |
-          benchmark.json
-        overwrite: true
-
-    if: ${{ (inputs.machine == 'windows-x86_64-pythonperf1' || inputs.machine == 'all')
-      }}
