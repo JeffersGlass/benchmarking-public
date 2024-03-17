@@ -282,7 +282,8 @@ jobs:
       # Requires "Developer Mode" switched on in Windows 10/11
     - name: Setup environment
       run: |-
-        echo "BUILD_DEST=PCBuild/amd64" >> $env:GITHUB_ENV
+        mkdir build
+        echo "BUILD_DEST=build" >> $env:GITHUB_ENV
         echo "BENCHMARK_MACHINE_NICKNAME=pythonperf1" >> $env:GITHUB_ENV
         choco install llvm --version 16.0.6
     - name: Enable symlinks for git
