@@ -194,9 +194,7 @@ jobs:
         echo "BENCHMARK_MACHINE_NICKNAME=darwin" >> $GITHUB_ENV
     - name: Install Packages
       run: |-
-        wget https://apt.llvm.org/llvm.sh
-        chmod +x llvm.sh
-        sudo ./llvm.sh 16
+        brew install llvm@16
     - name: Checkout benchmarking
       uses: actions/checkout@v4
     - name: Checkout CPython
