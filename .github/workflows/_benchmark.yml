@@ -88,6 +88,11 @@ jobs:
     - name: Setup environment
       run: |-
         echo "BENCHMARK_MACHINE_NICKNAME=linux" >> $GITHUB_ENV
+    - name: Install Packages
+      run: |-
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 16
     - name: Checkout benchmarking
       uses: actions/checkout@v4
     - name: Setup system Python
@@ -181,12 +186,17 @@ jobs:
 
     if: ${{ (inputs.machine == 'linux-x86_64-linux' || inputs.machine == 'all') }}
   benchmark-darwin-arm64-darwin:
-    runs-on: [macos-latest]
+    runs-on: [macos-13]
 
     steps:
     - name: Setup environment
       run: |-
         echo "BENCHMARK_MACHINE_NICKNAME=darwin" >> $GITHUB_ENV
+    - name: Install Packages
+      run: |-
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 16
     - name: Checkout benchmarking
       uses: actions/checkout@v4
     - name: Checkout CPython
@@ -276,6 +286,7 @@ jobs:
       run: |-
         echo "BUILD_DEST=PCBuild/amd64" >> $env:GITHUB_ENV
         echo "BENCHMARK_MACHINE_NICKNAME=pythonperf1" >> $env:GITHUB_ENV
+        choco install llvm --version 16.0.6
     - name: Enable symlinks for git
       run: |
         git config --global core.symlinks true
