@@ -44,8 +44,6 @@
 
 ### vs. base
 
-- Geometric mean: 1.00x faster (HPT: reliability of 73.05%, 1.00x faster at 99th %ile)
-- Memory usage: 1.02x
 - [🧠memory plot](bm-20240316-linux-x86_64-jeffersglass-justin_supernodes_on-3.13.0a5%2B-f486338-vs-base-mem.png)
 - [📄table](bm-20240316-linux-x86_64-jeffersglass-justin_supernodes_on-3.13.0a5%2B-f486338-vs-base.md)
 - [📈time plot](bm-20240316-linux-x86_64-jeffersglass-justin_supernodes_on-3.13.0a5%2B-f486338-vs-base.png)
