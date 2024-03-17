@@ -11,7 +11,7 @@
 
 ## linux x86_64 (linux)
 
-- [GitHub Action run](https://github.com/JeffersGlass/benchmarking-public/actions/runs/8310269765)
+- [GitHub Action run](https://github.com/JeffersGlass/benchmarking-public/actions/runs/8310940868)
 - cpu model: AMD EPYC 7763 64-Core Processor
 - platform: Linux-6.5.0-1016-azure-x86_64-with-glibc2.35
 - [raw results](bm-20240315-linux-x86_64-python-1904f0a2245f500aa85f-3.13.0a5%2B-1904f0a.json)
